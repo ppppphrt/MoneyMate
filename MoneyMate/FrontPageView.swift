@@ -33,12 +33,13 @@ struct FrontPageView: View {
                                    .cornerRadius(40)
                                    .padding(.horizontal, 20)
                            }
-            .padding(.bottom, 40)
+            .padding(.bottom, 60)
         }
         .background(Color.white)
         .edgesIgnoringSafeArea(.all)
     }
 }
+
 
 struct FrontPageView_Previews: PreviewProvider {
     static var previews: some View {
