@@ -4,7 +4,7 @@ struct TransactionsList: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Recent Transaction")
+                Text("Recent Transactions")
                     .font(.title3)
                     .bold()
 
