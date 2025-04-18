@@ -72,6 +72,7 @@ struct HomePage: View {
             }
             TransactionsList()
             Spacer()
+            TabView().padding(.bottom, 0)
         }
         .edgesIgnoringSafeArea(.top)
     }
