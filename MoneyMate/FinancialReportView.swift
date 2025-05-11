@@ -2,7 +2,9 @@ import SwiftUI
 
 struct FinancialReportView: View {
     @State private var selectedTab = 0
-    @State private var isExpanded = true  // Set to true initially to match the image
+    @State private var isExpanded = true
+    @State private var showIncomeView = false
+    @Environment(\.presentationMode) var presentationMode
     
     let totalAmount: Double = 500
     
@@ -14,30 +16,46 @@ struct FinancialReportView: View {
     ]
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 20) {
-                // Tab selector
-                HStack(spacing: 0) {
-                    TabButton(title: "Expense", isSelected: selectedTab == 0) {
-                        selectedTab = 0
+        VStack(spacing: 30) {
+            // Tab selector
+            HStack(spacing: 0) {
+                TabButton(title: "Expense", isSelected: selectedTab == 0) {
+                    selectedTab = 0
+                    showIncomeView = false
+                }
+                
+                TabButton(title: "Income", isSelected: selectedTab == 1) {
+                    selectedTab = 1
+                    showIncomeView = true
+                }
+            }
+            .background(Color(UIColor.systemGray6))
+            .cornerRadius(25)
+            .padding(.horizontal)
+            
+            // Show appropriate view based on selection
+            if showIncomeView {
+                // Navigate back and then to Income view
+                ZStack {
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        EmptyView()
                     }
-                    
-                    TabButton(title: "Income", isSelected: selectedTab == 1) {
-                        selectedTab = 1
+                    .hidden()
+                    .onAppear {
+                        presentationMode.wrappedValue.dismiss()
                     }
                 }
-                .background(Color(UIColor.systemGray6))
-                .cornerRadius(25)
-                .padding(.horizontal)
-                
-                // Donut chart
+            } else {
+                // Donut chart - same size as income view
                 ZStack {
                     DonutChart(data: expenses.map { $0.amount },
                               colors: expenses.map { $0.color },
                               centerText: "500 ฿")
-                        .frame(height: 200)
+                        .frame(width: 200, height: 200)
                 }
-                .padding(.vertical, 20)
+                .padding(.vertical, 40)
                 
                 // Categories section
                 VStack(alignment: .leading, spacing: 20) {
@@ -67,11 +85,77 @@ struct FinancialReportView: View {
                         }
                     }
                 }
-                
-                Spacer()
             }
-            .navigationBarTitle("Financial Report", displayMode: .inline)
+            
+            Spacer()
+            
+            // Tab bar
+            ZStack {
+                Rectangle()
+                    .fill(Color(UIColor.systemGray6))
+                    .frame(height: 70)
+                    .edgesIgnoringSafeArea(.bottom)
+                
+                HStack(spacing: 0) {
+                    Spacer()
+                    
+                    VStack(spacing: 4) {
+                        Image(systemName: "house")
+                            .foregroundColor(.gray)
+                        Text("Home")
+                            .font(.system(size: 12))
+                            .foregroundColor(.gray)
+                    }
+                    
+                    Spacer()
+                    
+                    VStack(spacing: 4) {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .foregroundColor(.gray)
+                        Text("History")
+                            .font(.system(size: 12))
+                            .foregroundColor(.gray)
+                    }
+                    
+                    Spacer()
+                    
+                    ZStack {
+                        Circle()
+                            .fill(Color(red: 0.6, green: 0.4, blue: 0.8))  // Purple button
+                            .frame(width: 60, height: 60)
+                            .offset(y: -15)
+                        
+                        Image(systemName: "plus")
+                            .font(.system(size: 24))
+                            .foregroundColor(.white)
+                            .offset(y: -15)
+                    }
+                    
+                    Spacer()
+                    
+                    VStack(spacing: 4) {
+                        Image(systemName: "chart.bar")
+                            .foregroundColor(.gray)
+                        Text("Report")
+                            .font(.system(size: 12))
+                            .foregroundColor(.gray)
+                    }
+                    
+                    Spacer()
+                    
+                    VStack(spacing: 4) {
+                        Image(systemName: "person")
+                            .foregroundColor(.gray)
+                        Text("Profile")
+                            .font(.system(size: 12))
+                            .foregroundColor(.gray)
+                    }
+                    
+                    Spacer()
+                }
+            }
         }
+        .navigationBarTitle("Financial Report", displayMode: .inline)
     }
 }
 
@@ -84,7 +168,7 @@ struct TabButton: View {
         Button(action: action) {
             Text(title)
                 .fontWeight(.medium)
-                .padding(.vertical, 12)
+                .padding(.vertical, 15)
                 .frame(maxWidth: .infinity)
                 .background(isSelected ? Color(red: 1.0, green: 0.35, blue: 0.35) : Color.clear)
                 .foregroundColor(isSelected ? .white : .black)
@@ -122,7 +206,7 @@ struct DonutChart: View {
                 
                 Arc(startAngle: angles[index], endAngle: endAngle)
                     .fill(colors[index])
-                    .frame(width: 200, height: 200)
+                    .frame(width: 200, height: 200)  // Set consistent size
             }
             
             Circle()
@@ -184,7 +268,7 @@ struct ExpenseRow: View {
                     
                     Rectangle()
                         .fill(color)
-                        .frame(width: geometry.size.width * CGFloat(amount / 300), height: 8)
+                        .frame(width: geometry.size.width * CGFloat(amount / 500), height: 8)  // Normalized to total
                         .cornerRadius(4)
                 }
             }
@@ -194,8 +278,6 @@ struct ExpenseRow: View {
     }
 }
 
-struct FinancialReportView_Previews: PreviewProvider {
-    static var previews: some View {
-        FinancialReportView()
-    }
+#Preview {
+    FinancialReportView()
 }

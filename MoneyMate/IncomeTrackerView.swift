@@ -1,8 +1,8 @@
 import SwiftUI
 
-struct ExpenseTrackerView: View {
-    @State private var isExpenseSelected = true
-    @State private var totalExpense: Double = 0
+struct IncomeTrackerView: View {
+    @State private var isExpenseSelected = false // Income selected by default
+    @State private var totalIncome: Double = 0
     @State private var selectedCategory: String?
     @State private var title: String = ""
     @State private var description: String = ""
@@ -12,15 +12,16 @@ struct ExpenseTrackerView: View {
     @State private var showDatePicker = false
     @State private var showTimePicker = false
     
-    // For navigation
-    @State private var showIncomeTrackerView = false
+    // For navigation between views
+    @State private var showExpenseTrackerView = false
     
-    let categories = ["Food", "Transportation", "Entertainment", "Shopping", "Utilities", "Health", "Other"]
+    let categories = ["Salary", "Investment", "Gift", "Business", "Other"]
     
     var body: some View {
         NavigationView {
             ZStack {
-                Color(hex: "#F85E5E")
+                // Green background for Income view
+                Color(hex: "#5AB88F")
                     .edgesIgnoringSafeArea(.all)
                 
                 VStack(spacing: 20) {
@@ -33,31 +34,31 @@ struct ExpenseTrackerView: View {
                                 HStack(spacing: 0) {
                                     Button(action: {
                                         isExpenseSelected = true
+                                        showExpenseTrackerView = true
                                     }) {
                                         Text("Expense")
                                             .fontWeight(.medium)
-                                            .foregroundColor(isExpenseSelected ? .white : Color(hex: "#F85E5E"))
+                                            .foregroundColor(isExpenseSelected ? .white : Color(hex: "#5AB88F"))
                                             .frame(maxWidth: .infinity)
                                             .frame(height: 44)
                                             .background(
                                                 isExpenseSelected ?
-                                                Capsule().fill(Color(hex: "#F85E5E")) :
+                                                Capsule().fill(Color(hex: "#5AB88F")) :
                                                 Capsule().fill(Color.clear)
                                             )
                                     }
                                     
                                     Button(action: {
                                         isExpenseSelected = false
-                                        showIncomeTrackerView = true
                                     }) {
                                         Text("Income")
                                             .fontWeight(.medium)
-                                            .foregroundColor(isExpenseSelected ? Color(hex: "#F85E5E") : .white)
+                                            .foregroundColor(isExpenseSelected ? Color(hex: "#5AB88F") : .white)
                                             .frame(maxWidth: .infinity)
                                             .frame(height: 44)
                                             .background(
                                                 !isExpenseSelected ?
-                                                Capsule().fill(Color(hex: "#F85E5E")) :
+                                                Capsule().fill(Color(hex: "#5AB88F")) :
                                                 Capsule().fill(Color.clear)
                                             )
                                     }
@@ -67,13 +68,13 @@ struct ExpenseTrackerView: View {
                             .padding(.horizontal)
                     }
                     
-                    // Total Expense Display
+                    // Total Income Display
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Total Expense")
+                        Text("Total Income")
                             .fontWeight(.medium)
                             .foregroundColor(.white.opacity(0.8))
                         
-                        Text("\(Int(totalExpense))")
+                        Text("\(Int(totalIncome))")
                             .font(.system(size: 60, weight: .bold))
                             .foregroundColor(.white)
                     }
@@ -102,7 +103,10 @@ struct ExpenseTrackerView: View {
                             .padding()
                             .background(Color.white)
                             .cornerRadius(25)
-                            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 25)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
                         }
                         
                         // Title Field
@@ -110,14 +114,20 @@ struct ExpenseTrackerView: View {
                             .padding()
                             .background(Color.white)
                             .cornerRadius(25)
-                            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 25)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
                         
                         // Description Field
                         TextField("Description", text: $description)
                             .padding()
                             .background(Color.white)
                             .cornerRadius(25)
-                            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 25)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
                         
                         // Amount Field
                         TextField("Amount", text: $amount)
@@ -125,7 +135,10 @@ struct ExpenseTrackerView: View {
                             .padding()
                             .background(Color.white)
                             .cornerRadius(25)
-                            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 25)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
                         
                         // Date and Time Selection
                         HStack(spacing: 10) {
@@ -138,7 +151,7 @@ struct ExpenseTrackerView: View {
                                 }
                                 .padding()
                                 .frame(maxWidth: .infinity)
-                                .background(Color(hex: "#4F5E5E"))
+                                .background(Color(hex: "#607277"))
                                 .foregroundColor(.white)
                                 .cornerRadius(25)
                             }
@@ -152,13 +165,13 @@ struct ExpenseTrackerView: View {
                                 }
                                 .padding()
                                 .frame(maxWidth: .infinity)
-                                .background(Color(hex: "#1F9C9C"))
+                                .background(Color(hex: "#42A1A1"))
                                 .foregroundColor(.white)
                                 .cornerRadius(25)
                             }
                         }
                         
-                        // Add Button
+                        // Add Button - green to match design
                         Button(action: {
                             addTransaction()
                         }) {
@@ -166,7 +179,7 @@ struct ExpenseTrackerView: View {
                                 .fontWeight(.semibold)
                                 .frame(maxWidth: .infinity)
                                 .padding()
-                                .background(Color(hex: "#F85E5E"))
+                                .background(Color(hex: "#5AB88F"))
                                 .foregroundColor(.white)
                                 .cornerRadius(25)
                         }
@@ -179,8 +192,8 @@ struct ExpenseTrackerView: View {
                     .edgesIgnoringSafeArea(.bottom)
                 }
                 
-                // Navigation link to IncomeTrackerView
-                NavigationLink(destination: IncomeTrackerView(), isActive: $showIncomeTrackerView) {
+                // Navigation link for switching to ExpenseTrackerView
+                NavigationLink(destination: ExpenseTrackerView(), isActive: $showExpenseTrackerView) {
                     EmptyView()
                 }
                 .hidden()
@@ -198,8 +211,8 @@ struct ExpenseTrackerView: View {
     func addTransaction() {
         // Logic to add a transaction
         if let amountValue = Double(amount), !title.isEmpty, selectedCategory != nil {
-            if isExpenseSelected {
-                totalExpense += amountValue
+            if !isExpenseSelected {
+                totalIncome += amountValue
             }
             
             // Clear fields
@@ -213,110 +226,16 @@ struct ExpenseTrackerView: View {
     }
 }
 
-// Custom rounded corner modifier
-extension View {
-    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
-        clipShape(RoundedCorner(radius: radius, corners: corners))
-    }
-}
 
-struct RoundedCorner: Shape {
-    var radius: CGFloat = .infinity
-    var corners: UIRectCorner = .allCorners
-    
-    func path(in rect: CGRect) -> Path {
-        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
-        return Path(path.cgPath)
-    }
-}
-
-// Helper for hex colors
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3: // RGB (12-bit)
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6: // RGB (24-bit)
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8: // ARGB (32-bit)
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            (a, r, g, b) = (1, 1, 1, 0)
-        }
-        
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue: Double(b) / 255,
-            opacity: Double(a) / 255
-        )
-    }
-}
-
-// Date Picker View
-struct DatePickerView: View {
-    @Binding var selectedDate: Date
-    @Binding var isPresented: Bool
-    
-    var body: some View {
-        VStack {
-            HStack {
-                Spacer()
-                Button("Done") {
-                    isPresented = false
-                }
-                .padding()
-            }
-            
-            DatePicker(
-                "Select a date",
-                selection: $selectedDate,
-                displayedComponents: .date
-            )
-            .datePickerStyle(GraphicalDatePickerStyle())
-            .padding()
-            
-            Spacer()
-        }
-    }
-}
-
-// Time Picker View
-struct TimePickerView: View {
-    @Binding var selectedTime: Date
-    @Binding var isPresented: Bool
-    
-    var body: some View {
-        VStack {
-            HStack {
-                Spacer()
-                Button("Done") {
-                    isPresented = false
-                }
-                .padding()
-            }
-            
-            DatePicker(
-                "Select a time",
-                selection: $selectedTime,
-                displayedComponents: .hourAndMinute
-            )
-            .datePickerStyle(WheelDatePickerStyle())
-            .padding()
-            
-            Spacer()
-        }
-    }
-}
-
-// Preview
-struct ExpenseTrackerView_Previews: PreviewProvider {
+// Preview provider
+struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ExpenseTrackerView()
+        Group {
+            IncomeTrackerView()
+                .previewDisplayName("Income Tracker")
+            
+            ExpenseTrackerView()
+                .previewDisplayName("Expense Tracker")
+        }
     }
 }
