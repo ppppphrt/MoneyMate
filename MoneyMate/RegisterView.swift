@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct RegisterView: View {
     @State private var name = ""
@@ -15,6 +16,8 @@ struct RegisterView: View {
     @State private var rememberMe = true
     @State private var isPasswordVisible = false
     @State private var isConfirmPasswordVisible = false
+    @State private var showAlert = false
+    @State private var alertMessage = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -50,6 +53,15 @@ struct RegisterView: View {
 
             Button(action: {
                 // Handle Next button action
+                    Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
+        if let error = error {
+            alertMessage = "Registration failed: \(error.localizedDescription)"
+            showAlert = true
+        } else {
+            alertMessage = "Registration successful! Welcome, \(authResult?.user.email ?? "")"
+            showAlert = true
+        }
+    }
             }) {
                 Text("Next")
                     .foregroundColor(.white)
@@ -59,6 +71,9 @@ struct RegisterView: View {
                     .background(Color.purple)
                     .cornerRadius(28)
             }
+            .alert(isPresented: $showAlert) {
+    Alert(title: Text("Registration"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+}
         }
         .padding(.horizontal, 24)
         .padding(.bottom, 20)

@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var isPasswordVisible = false
     @State private var rememberMe = true
+    @State private var showAlert = false
+    @State private var alertMessage = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -42,6 +45,15 @@ struct LoginView: View {
 
             Button(action: {
                 // Handle login action
+                    Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
+        if let error = error {
+            alertMessage = "Login failed: \(error.localizedDescription)"
+            showAlert = true
+        } else {
+            alertMessage = "Login successful! Welcome back, \(authResult?.user.email ?? "")"
+            showAlert = true
+        }
+    }
             }) {
                 Text("Login")
                     .foregroundColor(.white)
@@ -51,6 +63,9 @@ struct LoginView: View {
                     .background(Color.purple)
                     .cornerRadius(28)
             }
+            .alert(isPresented: $showAlert) {
+    Alert(title: Text("Login"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+}
         }
         .padding(.horizontal, 24)
         .padding(.bottom, 20)

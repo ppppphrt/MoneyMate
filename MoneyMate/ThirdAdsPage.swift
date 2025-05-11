@@ -53,7 +53,7 @@ struct ThirdAdsPage: View {
             .padding(.bottom, 40)
             
             // Next Button
-            NavigationLink(destination: ThirdAdsPage()) {
+            NavigationLink(destination: WelcomeView()) {
                                Text("Next")
                                    .foregroundColor(.white)
                                    .fontWeight(.semibold)
