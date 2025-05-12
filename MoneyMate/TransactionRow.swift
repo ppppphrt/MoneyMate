@@ -16,7 +16,7 @@ struct TransactionRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(transaction.category)
                     .font(.headline)
-                Text(transaction.description)
+                Text(transaction.note)
                     .font(.subheadline)
                     .foregroundColor(.gray)
             }
