@@ -80,7 +80,7 @@ struct LoginView: View {
             .padding(.bottom, 20)
             .navigationBarBackButtonHidden(true)
         }
-        .navigationBarBackButtonHidden(true)
+//        .navigationBarBackButtonHidden(true)
     }
 }
 

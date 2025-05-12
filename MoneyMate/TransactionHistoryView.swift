@@ -40,6 +40,7 @@ struct TransactionHistoryView: View {
 //            MainView()
         }
         .edgesIgnoringSafeArea(.bottom)
+        .navigationBarBackButtonHidden(true)
     }
 }
 

@@ -6,6 +6,7 @@ struct ProfilePage: View {
     @State private var userDisplayName: String = ""
     @State private var userEmail: String = ""
     @AppStorage("isLoggedIn") var isLoggedIn: Bool = true
+    @EnvironmentObject var tabSelection: TabSelection
     
     var body: some View {
         NavigationStack {
@@ -42,7 +43,9 @@ struct ProfilePage: View {
                 
                 // Options
                 VStack(spacing: 16) {
-                    NavigationLink(destination: HomePage()) {
+                    Button {
+                        tabSelection.selectedTab = .home
+                    } label: {
                         MenuItem(icon: "house.fill", label: "Home", iconColor: .purple)
                     }
 
@@ -98,6 +101,7 @@ struct ProfilePage: View {
                 loadUser()
             }
             .background(Color.white.edgesIgnoringSafeArea(.all))
+            .navigationBarBackButtonHidden(true)
         }
     }
 
@@ -108,13 +112,14 @@ struct ProfilePage: View {
     }
 
     func logout() {
-            do {
-                try Auth.auth().signOut()
-                isLoggedIn = false
-            } catch {
-                print("Logout failed: \(error.localizedDescription)")
-            }
+        do {
+            try Auth.auth().signOut()
+            isLoggedIn = false
+        } catch {
+            print("Logout failed: \(error.localizedDescription)")
+        }
     }
+
 }
 
 

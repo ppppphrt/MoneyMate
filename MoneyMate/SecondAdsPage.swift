@@ -64,6 +64,7 @@ struct SecondAdsPage: View {
         }
         .background(Color.white)
         .edgesIgnoringSafeArea(.all)
+        .navigationBarBackButtonHidden(true)
     }
 }
 

@@ -144,6 +144,7 @@ struct TransactionEntryView: View {
         .sheet(isPresented: $showTimePicker) {
             TimePickerView(selectedTime: $selectedTime, isPresented: $showTimePicker)
         }
+        .navigationBarBackButtonHidden(true)
     }
 
     // MARK: - Save Transaction Logic

@@ -5,15 +5,19 @@ enum Tab {
     case home, history, add, report, profile
 }
 
+class TabSelection: ObservableObject {
+    @Published var selectedTab: Tab = .home
+}
+
 // MARK: - MainView
 struct MainView: View {
-    @State private var selectedTab: Tab = .home
+    @StateObject private var tabSelection = TabSelection()
     
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: 0) {
                 
-                TabView(selection: $selectedTab) {
+                TabView(selection: $tabSelection.selectedTab) {
                     HomePage()
                         .tag(Tab.home)
                     
@@ -30,12 +34,9 @@ struct MainView: View {
                         .tag(Tab.profile)
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                
-                // Custom Tab Bar
-                CustomTabBar(selectedTab: $selectedTab)
-                    .frame(height: 70)
+                CustomTabBar(selectedTab: $tabSelection.selectedTab).frame(height: 70)
             }
-            .edgesIgnoringSafeArea(.bottom)
+            .environmentObject(tabSelection)
         }
     }
 }
