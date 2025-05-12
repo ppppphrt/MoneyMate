@@ -12,14 +12,14 @@ struct FinancialReportView: View {
     
     @StateObject private var viewModel = ExpenseViewModel()
     
-//    let totalAmount: Double = 500
-//    
-//    // Fixed explicit type annotation
-//    let expenses: [(category: String, amount: Double, color: Color)] = [
-//        ("Shopping", 200, Color(red: 0.78, green: 0.49, blue: 0.90)), // Purple
-//        ("Subcription", 185, Color(red: 1.0, green: 0.35, blue: 0.35)), // Red
-//        ("Food", 100, Color(red: 1.0, green: 0.65, blue: 0.24)) // Orange
-//    ]
+    //    let totalAmount: Double = 500
+    //
+    //    // Fixed explicit type annotation
+    //    let expenses: [(category: String, amount: Double, color: Color)] = [
+    //        ("Shopping", 200, Color(red: 0.78, green: 0.49, blue: 0.90)), // Purple
+    //        ("Subcription", 185, Color(red: 1.0, green: 0.35, blue: 0.35)), // Red
+    //        ("Food", 100, Color(red: 1.0, green: 0.65, blue: 0.24)) // Orange
+    //    ]
     
     var body: some View {
         VStack(spacing: 30) {
@@ -57,11 +57,11 @@ struct FinancialReportView: View {
                 // Donut chart - same size as income view
                 ZStack {
                     DonutChart(data: viewModel.expenses
-.map { $0.amount },
-                              colors: viewModel.expenses
-.map { $0.color },
-                              centerText: "500 ฿")
-                        .frame(width: 200, height: 200)
+                        .map { $0.amount },
+                               colors: viewModel.expenses
+                        .map { $0.color },
+                               centerText: "500 ฿")
+                    .frame(width: 200, height: 200)
                 }
                 .padding(.vertical, 40)
                 
@@ -96,195 +96,135 @@ struct FinancialReportView: View {
             }
             
             Spacer()
+            MainView()
             
-            // Tab bar
-            ZStack {
-                Rectangle()
-                    .fill(Color(UIColor.systemGray6))
-                    .frame(height: 70)
-                    .edgesIgnoringSafeArea(.bottom)
-                
-                HStack(spacing: 0) {
-                    Spacer()
-                    
-                    VStack(spacing: 4) {
-                        Image(systemName: "house")
-                            .foregroundColor(.gray)
-                        Text("Home")
-                            .font(.system(size: 12))
-                            .foregroundColor(.gray)
-                    }
-                    
-                    Spacer()
-                    
-                    VStack(spacing: 4) {
-                        Image(systemName: "clock.arrow.circlepath")
-                            .foregroundColor(.gray)
-                        Text("History")
-                            .font(.system(size: 12))
-                            .foregroundColor(.gray)
-                    }
-                    
-                    Spacer()
-                    
-                    ZStack {
-                        Circle()
-                            .fill(Color(red: 0.6, green: 0.4, blue: 0.8))  // Purple button
-                            .frame(width: 60, height: 60)
-                            .offset(y: -15)
-                        
-                        Image(systemName: "plus")
-                            .font(.system(size: 24))
-                            .foregroundColor(.white)
-                            .offset(y: -15)
-                    }
-                    
-                    Spacer()
-                    
-                    VStack(spacing: 4) {
-                        Image(systemName: "chart.bar")
-                            .foregroundColor(.gray)
-                        Text("Report")
-                            .font(.system(size: 12))
-                            .foregroundColor(.gray)
-                    }
-                    
-                    Spacer()
-                    
-                    VStack(spacing: 4) {
-                        Image(systemName: "person")
-                            .foregroundColor(.gray)
-                        Text("Profile")
-                            .font(.system(size: 12))
-                            .foregroundColor(.gray)
-                    }
-                    
-                    Spacer()
-                }
-            }
+            
         }
+        
         .navigationBarTitle("Financial Report", displayMode: .inline)
+        
     }
-}
-
-struct TabButton: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
     
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .fontWeight(.medium)
-                .padding(.vertical, 15)
-                .frame(maxWidth: .infinity)
-                .background(isSelected ? Color(red: 1.0, green: 0.35, blue: 0.35) : Color.clear)
-                .foregroundColor(isSelected ? .white : .black)
-                .cornerRadius(25)
+    struct TabButton: View {
+        let title: String
+        let isSelected: Bool
+        let action: () -> Void
+        
+        var body: some View {
+            Button(action: action) {
+                Text(title)
+                    .fontWeight(.medium)
+                    .padding(.vertical, 15)
+                    .frame(maxWidth: .infinity)
+                    .background(isSelected ? Color(red: 1.0, green: 0.35, blue: 0.35) : Color.clear)
+                    .foregroundColor(isSelected ? .white : .black)
+                    .cornerRadius(25)
+            }
         }
     }
-}
-
-struct DonutChart: View {
-    let data: [Double]
-    let colors: [Color]
-    let centerText: String
     
-    private var total: Double {
-        data.reduce(0, +)
-    }
-    
-    private var angles: [Angle] {
-        var angles: [Angle] = []
-        var startAngle = Angle(degrees: 0)
+    struct DonutChart: View {
+        let data: [Double]
+        let colors: [Color]
+        let centerText: String
         
-        for value in data {
-            let angle = Angle(degrees: 360 * (value / total))
-            angles.append(startAngle)
-            startAngle += angle
+        private var total: Double {
+            data.reduce(0, +)
         }
         
-        return angles
-    }
-    
-    var body: some View {
-        ZStack {
-            ForEach(0..<data.count, id: \.self) { index in
-                let endAngle = angles[index] + Angle(degrees: 360 * (data[index] / total))
-                
-                Arc(startAngle: angles[index], endAngle: endAngle)
-                    .fill(colors[index])
-                    .frame(width: 200, height: 200)  // Set consistent size
+        private var angles: [Angle] {
+            var angles: [Angle] = []
+            var startAngle = Angle(degrees: 0)
+            
+            for value in data {
+                let angle = Angle(degrees: 360 * (value / total))
+                angles.append(startAngle)
+                startAngle += angle
             }
             
-            Circle()
-                .fill(Color.white)
-                .frame(width: 120, height: 120)
-            
-            Text(centerText)
-                .font(.system(size: 32, weight: .bold))
+            return angles
         }
-    }
-}
-
-struct Arc: Shape {
-    var startAngle: Angle
-    var endAngle: Angle
-    
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let center = CGPoint(x: rect.midX, y: rect.midY)
-        let radius = min(rect.width, rect.height) / 2
-        let innerRadius = radius * 0.6
         
-        path.addArc(center: center, radius: radius, startAngle: startAngle, endAngle: endAngle, clockwise: false)
-        path.addArc(center: center, radius: innerRadius, startAngle: endAngle, endAngle: startAngle, clockwise: true)
-        path.closeSubpath()
-        
-        return path
-    }
-}
-
-struct ExpenseRow: View {
-    let category: String
-    let amount: Double
-    let color: Color
-    
-    var body: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Circle()
-                    .fill(color)
-                    .frame(width: 12, height: 12)
-                
-                Text(category)
-                    .fontWeight(.medium)
-                
-                Spacer()
-                
-                Text("- \(Int(amount)) ฿")
-                    .fontWeight(.medium)
-                    .foregroundColor(Color(red: 1.0, green: 0.35, blue: 0.35)) // Red color
-            }
-            
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    Rectangle()
-                        .fill(Color(UIColor.systemGray6))
-                        .frame(width: geometry.size.width, height: 8)
-                        .cornerRadius(4)
+        var body: some View {
+            ZStack {
+                ForEach(0..<data.count, id: \.self) { index in
+                    let endAngle = angles[index] + Angle(degrees: 360 * (data[index] / total))
                     
-                    Rectangle()
-                        .fill(color)
-                        .frame(width: geometry.size.width * CGFloat(amount / 500), height: 8)  // Normalized to total
-                        .cornerRadius(4)
+                    Arc(startAngle: angles[index], endAngle: endAngle)
+                        .fill(colors[index])
+                        .frame(width: 200, height: 200)  // Set consistent size
                 }
+                
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 120, height: 120)
+                
+                Text(centerText)
+                    .font(.system(size: 32, weight: .bold))
             }
-            .frame(height: 8)
         }
-        .padding(.horizontal)
-        .navigationBarBackButtonHidden(true)
     }
+    
+    struct Arc: Shape {
+        var startAngle: Angle
+        var endAngle: Angle
+        
+        func path(in rect: CGRect) -> Path {
+            var path = Path()
+            let center = CGPoint(x: rect.midX, y: rect.midY)
+            let radius = min(rect.width, rect.height) / 2
+            let innerRadius = radius * 0.6
+            
+            path.addArc(center: center, radius: radius, startAngle: startAngle, endAngle: endAngle, clockwise: false)
+            path.addArc(center: center, radius: innerRadius, startAngle: endAngle, endAngle: startAngle, clockwise: true)
+            path.closeSubpath()
+            
+            return path
+        }
+    }
+    
+    struct ExpenseRow: View {
+        let category: String
+        let amount: Double
+        let color: Color
+        
+        var body: some View {
+            VStack(spacing: 8) {
+                HStack {
+                    Circle()
+                        .fill(color)
+                        .frame(width: 12, height: 12)
+                    
+                    Text(category)
+                        .fontWeight(.medium)
+                    
+                    Spacer()
+                    
+                    Text("- \(Int(amount)) ฿")
+                        .fontWeight(.medium)
+                        .foregroundColor(Color(red: 1.0, green: 0.35, blue: 0.35)) // Red color
+                }
+                
+                GeometryReader { geometry in
+                    ZStack(alignment: .leading) {
+                        Rectangle()
+                            .fill(Color(UIColor.systemGray6))
+                            .frame(width: geometry.size.width, height: 8)
+                            .cornerRadius(4)
+                        
+                        Rectangle()
+                            .fill(color)
+                            .frame(width: geometry.size.width * CGFloat(amount / 500), height: 8)  // Normalized to total
+                            .cornerRadius(4)
+                    }
+                }
+                .frame(height: 8)
+            }
+            .padding(.horizontal)
+            .navigationBarBackButtonHidden(true)
+        }
+    }
+    
 }
 
 #Preview {

@@ -2,6 +2,7 @@ import SwiftUI
 import Firebase
 import FirebaseAuth
 
+
 struct HomePage: View {
 
     @StateObject private var viewModel = TransactionViewModel()
@@ -107,7 +108,7 @@ struct HomePage: View {
                 .padding(.horizontal)
             }
             Spacer()
-            CustomTabBar()
+            MainView()
         }
 //        .edgesIgnoringSafeArea(.top)
         .navigationBarBackButtonHidden(true)

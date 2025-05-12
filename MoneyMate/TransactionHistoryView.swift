@@ -37,7 +37,7 @@ struct TransactionHistoryView: View {
             }
 
             Spacer()
-            CustomTabBar()
+            MainView()
         }
         .edgesIgnoringSafeArea(.bottom)
     }

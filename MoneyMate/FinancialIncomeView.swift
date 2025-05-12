@@ -82,7 +82,7 @@ struct FinancialIncomeView: View {
                         }
                     }
                     Spacer()
-                    CustomTabBar()
+                    MainView()
                 }
                 .navigationBarTitle("Financial Report", displayMode: .inline)
                 .navigationBarBackButtonHidden(true)
