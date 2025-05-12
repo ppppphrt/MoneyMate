@@ -1,18 +1,18 @@
 import SwiftUI
-
-let lightPurp = Color(red: 196/255, green: 170/255, blue: 247/255)
-let lightGreen = Color(red: 48/255, green: 194/255, blue: 133/255)
-let lightRed = Color(red: 243/255, green: 93/255, blue: 104/255)
+import Firebase
+import FirebaseAuth
 
 struct HomePage: View {
 
-    // Mock transactions
-    let transactions: [Transaction] = [
-        Transaction(id: "1", category: "Shopping", note: "Shirt", amount: -200, time: "08:00 AM", color: Color.purple.opacity(0.7), icon: "basket.fill"),
-        Transaction(id: "2", category: "Food", note: "Cookies", amount: -100, time: "05:00 PM", color: Color.orange.opacity(0.7), icon: "fork.knife"),
-        Transaction(id: "3", category: "Transportation", note: "BTS", amount: -15, time: "07:20 PM", color: Color.blue.opacity(0.7), icon: "car.fill"),
-        Transaction(id: "4", category: "Subscription", note: "Youtube", amount: -185, time: "09:30 PM", color: Color.red.opacity(0.7), icon: "doc.text.fill")
-    ]
+    @StateObject private var viewModel = TransactionViewModel()
+    
+    var totalIncome: Double {
+        viewModel.transactions.filter { $0.amount > 0 }.map(\.amount).reduce(0, +)
+    }
+
+    var totalExpense: Double {
+        viewModel.transactions.filter { $0.amount < 0 }.map(\.amount).reduce(0, +)
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -32,7 +32,7 @@ struct HomePage: View {
                             .frame(width: 50, height: 50)
                             .foregroundColor(.white)
 
-                        Text("Welcome  Boo Boo")
+                        Text("Welcome \(Auth.auth().currentUser?.displayName ?? Auth.auth().currentUser?.email ?? "User")")
                             .font(.headline)
                             .foregroundColor(.white)
                             .padding(.leading, 5)
@@ -54,7 +54,7 @@ struct HomePage: View {
                                         .foregroundColor(.white)
                                         .font(.subheadline)
                                         .bold()
-                                    Text("900 ฿")
+                                    Text("\(Int(totalIncome)) ฿")
                                         .foregroundColor(.white)
                                         .font(.headline)
                                 }
@@ -71,7 +71,7 @@ struct HomePage: View {
                                         .foregroundColor(.white)
                                         .font(.subheadline)
                                         .bold()
-                                    Text("500 ฿")
+                                    Text("\(abs(Int(totalExpense))) ฿")
                                         .foregroundColor(.white)
                                         .font(.headline)
                                 }
@@ -99,59 +99,18 @@ struct HomePage: View {
             // Transactions List
             ScrollView {
                 VStack(spacing: 15) {
-                    ForEach(transactions) { transaction in
+                    ForEach(viewModel.transactions.prefix(5)) { transaction in
                         TransactionRow(transaction: transaction)
                     }
+
                 }
                 .padding(.horizontal)
             }
-
             Spacer()
-
-            // Tab Bar
-            ZStack {
-                Rectangle()
-                    .fill(Color(UIColor.systemGray6))
-                    .frame(height: 70)
-                    .edgesIgnoringSafeArea(.bottom)
-
-                HStack(spacing: 0) {
-                    Spacer()
-                    VStack(spacing: 4) {
-                        Image(systemName: "house")
-                        Text("Home").font(.system(size: 12))
-                    }
-                    Spacer()
-                    VStack(spacing: 4) {
-                        Image(systemName: "clock.arrow.circlepath")
-                        Text("History").font(.system(size: 12))
-                    }
-                    Spacer()
-                    ZStack {
-                        Circle()
-                            .fill(lightPurp)
-                            .frame(width: 60, height: 60)
-                            .offset(y: -15)
-                        Image(systemName: "plus")
-                            .font(.system(size: 24))
-                            .foregroundColor(.white)
-                            .offset(y: -15)
-                    }
-                    Spacer()
-                    VStack(spacing: 4) {
-                        Image(systemName: "chart.bar")
-                        Text("Report").font(.system(size: 12))
-                    }
-                    Spacer()
-                    VStack(spacing: 4) {
-                        Image(systemName: "person")
-                        Text("Profile").font(.system(size: 12))
-                    }
-                    Spacer()
-                }
-            }
+            CustomTabBar()
         }
-        .edgesIgnoringSafeArea(.top)
+//        .edgesIgnoringSafeArea(.top)
+        .navigationBarBackButtonHidden(true)
     }
 }
 

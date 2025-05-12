@@ -24,9 +24,9 @@ struct TransactionRow: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 4) {
-                Text(String(format: "- %.0f ฿", abs(transaction.amount)))
+                Text(String(format: "%@ %.0f ฿", transaction.amount > 0 ? "+" : "-", abs(transaction.amount)))
                     .font(.headline)
-                    .foregroundColor(.red)
+                    .foregroundColor(transaction.amount > 0 ? .green : .red)
                 Text(transaction.time)
                     .font(.subheadline)
                     .foregroundColor(.gray)
@@ -38,4 +38,3 @@ struct TransactionRow: View {
         .shadow(color: Color.black.opacity(0.03), radius: 4, x: 0, y: 2)
     }
 }
-
