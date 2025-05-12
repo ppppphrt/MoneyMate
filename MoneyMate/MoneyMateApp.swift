@@ -9,7 +9,7 @@ struct MoneyMateApp: App {
 
     var body: some Scene {
         WindowGroup {
-            WelcomeView()
+            FrontPageView()
         }
     }
 }
