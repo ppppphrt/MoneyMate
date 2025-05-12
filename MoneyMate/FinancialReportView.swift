@@ -275,6 +275,7 @@ struct ExpenseRow: View {
             .frame(height: 8)
         }
         .padding(.horizontal)
+        .navigationBarBackButtonHidden(true)
     }
 }
 

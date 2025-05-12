@@ -18,6 +18,7 @@ struct RegisterView: View {
     @State private var isConfirmPasswordVisible = false
     @State private var showAlert = false
     @State private var alertMessage = ""
+    @State private var navigateToHome = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -59,7 +60,7 @@ struct RegisterView: View {
             showAlert = true
         } else {
             alertMessage = "Registration successful! Welcome, \(authResult?.user.email ?? "")"
-            showAlert = true
+            navigateToHome = true
         }
     }
             }) {
@@ -74,9 +75,14 @@ struct RegisterView: View {
             .alert(isPresented: $showAlert) {
     Alert(title: Text("Registration"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
 }
+            // Hidden navigation link trigger
+            NavigationLink(destination: HomePage(), isActive: $navigateToHome) {
+                EmptyView()
+            }
         }
         .padding(.horizontal, 24)
         .padding(.bottom, 20)
+        .navigationBarBackButtonHidden(true)
     }
 }
 
@@ -115,6 +121,7 @@ struct PasswordField: View {
         }
         .padding()
         .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.4)))
+        
     }
 }
 

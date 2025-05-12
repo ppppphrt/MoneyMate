@@ -28,5 +28,11 @@ struct TransactionsList: View {
             }
         }
         .padding(.top)
+        .navigationBarBackButtonHidden(true)
     }
 }
+
+#Preview {
+    TransactionsList()
+}
+
