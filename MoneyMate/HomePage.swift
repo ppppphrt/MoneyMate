@@ -86,12 +86,13 @@ struct HomePage: View {
                 Text("Recent Transaction")
                     .font(.headline)
                 Spacer()
-                Button("See All") {}
+                Text("See All")
                     .font(.subheadline)
-                    .foregroundColor(.gray)
-                    .padding(6)
-                    .background(Color(UIColor.systemGray5))
-                    .cornerRadius(12)
+                    .foregroundColor(.purple)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.purple.opacity(0.15))
+                    .cornerRadius(16)
             }
             .padding()
 
