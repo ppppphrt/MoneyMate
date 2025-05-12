@@ -20,7 +20,7 @@ struct MainView: View {
                     TransactionHistoryView()
                         .tag(Tab.history)
                     
-                    ExpenseTrackerView()
+                    TransactionEntryView()
                         .tag(Tab.add)
                     
                     FinancialReportView()

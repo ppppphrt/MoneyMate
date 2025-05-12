@@ -1,10 +1,3 @@
-//
-//  WelcomeView.swift
-//  MoneyMate
-//
-//  Created by ppppphrt on 11/5/2568 BE.
-//
-
 import SwiftUI
 
 struct WelcomeView: View {

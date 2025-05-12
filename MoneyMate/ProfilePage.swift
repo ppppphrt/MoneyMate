@@ -1,8 +1,12 @@
 import SwiftUI
+import FirebaseAuth
 
 struct ProfilePage: View {
     @State private var showLogoutAlert = false
-
+    @State private var userDisplayName: String = ""
+    @State private var userEmail: String = ""
+    @AppStorage("isLoggedIn") var isLoggedIn: Bool = true
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
@@ -30,7 +34,7 @@ struct ProfilePage: View {
                         .font(.caption)
                         .foregroundColor(.gray)
                     
-                    Text("Name")
+                    Text(userDisplayName.isEmpty ? userEmail : userDisplayName)
                         .font(.title2)
                         .fontWeight(.bold)
                 }
@@ -42,7 +46,7 @@ struct ProfilePage: View {
                         MenuItem(icon: "house.fill", label: "Home", iconColor: .purple)
                     }
 
-                    MenuItem(icon: "gearshape.fill", label: "Settings", iconColor: .purple) // You can wrap this in NavigationLink too if needed
+                    MenuItem(icon: "gearshape.fill", label: "Settings", iconColor: .purple)
 
                     Button(action: {
                         showLogoutAlert = true
@@ -50,18 +54,17 @@ struct ProfilePage: View {
                         MenuItem(icon: "arrow.right.square.fill", label: "Logout", iconColor: .red)
                     }
                 }
-
                 .padding()
                 
                 Spacer()
                 
-                // Logout
+                // Logout Alert
                 if showLogoutAlert {
                     VStack(spacing: 12) {
                         Text("Logout?")
                             .font(.headline)
                         
-                        Text("Are you sure do you wanna logout?")
+                        Text("Are you sure you want to log out?")
                             .font(.subheadline)
                             .foregroundColor(.gray)
                         
@@ -76,7 +79,7 @@ struct ProfilePage: View {
                             .cornerRadius(12)
                             
                             Button("Yes") {
-                                // Perform logout logic here
+                                logout()
                             }
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -91,10 +94,29 @@ struct ProfilePage: View {
                     .padding()
                 }
             }
+            .onAppear {
+                loadUser()
+            }
             .background(Color.white.edgesIgnoringSafeArea(.all))
         }
     }
+
+    func loadUser() {
+        let user = Auth.auth().currentUser
+        userDisplayName = user?.displayName ?? ""
+        userEmail = user?.email ?? ""
+    }
+
+    func logout() {
+            do {
+                try Auth.auth().signOut()
+                isLoggedIn = false
+            } catch {
+                print("Logout failed: \(error.localizedDescription)")
+            }
+    }
 }
+
 
 struct MenuItem: View {
     var icon: String
