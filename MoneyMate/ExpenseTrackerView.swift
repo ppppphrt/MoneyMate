@@ -185,8 +185,10 @@ struct ExpenseTrackerView: View {
                     EmptyView()
                 }
                 .hidden()
+                .navigationBarBackButtonHidden(true)
             }
-            .navigationBarHidden(true)
+//            .navigationBarHidden(true)
+            .navigationBarBackButtonHidden(true)
         }
         .sheet(isPresented: $showDatePicker) {
             DatePickerView(selectedDate: $selectedDate, isPresented: $showDatePicker)

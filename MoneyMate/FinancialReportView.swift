@@ -42,6 +42,9 @@ struct FinancialReportView: View {
             // Show appropriate view based on selection
             if showIncomeView {
                 // Navigate back and then to Income view
+                NavigationLink(destination: FinancialIncomeView(), isActive: $showIncomeView){
+                    EmptyView()
+                }
                 ZStack {
                     Button(action: {
                         presentationMode.wrappedValue.dismiss()
@@ -96,12 +99,12 @@ struct FinancialReportView: View {
             }
             
             Spacer()
-            MainView()
+//            MainView()
             
             
         }
         
-        .navigationBarTitle("Financial Report", displayMode: .inline)
+//        .navigationBarTitle("Financial Report", displayMode: .inline)
         
     }
     

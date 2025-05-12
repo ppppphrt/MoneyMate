@@ -197,9 +197,12 @@ struct IncomeTrackerView: View {
                 NavigationLink(destination: ExpenseTrackerView(), isActive: $showExpenseTrackerView) {
                     EmptyView()
                 }
+                
                 .hidden()
+//                .navigationBarHidden(true)
+                .navigationBarBackButtonHidden(true)
             }
-            .navigationBarHidden(true)
+           
         }
         .sheet(isPresented: $showDatePicker) {
             DatePickerView(selectedDate: $selectedDate, isPresented: $showDatePicker)

@@ -17,7 +17,6 @@ struct HomePage: View {
 
     var body: some View {
         VStack(spacing: 0) {
-
             // Top Section
             ZStack(alignment: .topLeading) {
                 RoundedRectangle(cornerRadius: 50)
@@ -108,7 +107,6 @@ struct HomePage: View {
                 .padding(.horizontal)
             }
             Spacer()
-            MainView()
         }
 //        .edgesIgnoringSafeArea(.top)
         .navigationBarBackButtonHidden(true)

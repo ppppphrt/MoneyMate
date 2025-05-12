@@ -37,7 +37,7 @@ struct TransactionHistoryView: View {
             }
 
             Spacer()
-            MainView()
+//            MainView()
         }
         .edgesIgnoringSafeArea(.bottom)
     }

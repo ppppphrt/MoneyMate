@@ -82,9 +82,9 @@ struct FinancialIncomeView: View {
                         }
                     }
                     Spacer()
-                    MainView()
+//                    MainView()
                 }
-                .navigationBarTitle("Financial Report", displayMode: .inline)
+//                .navigationBarTitle("Financial Report", displayMode: .inline)
                 .navigationBarBackButtonHidden(true)
             }
         }

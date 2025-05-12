@@ -43,10 +43,11 @@ struct LoginView: View {
                         .labelsHidden()
                 }
 
-                Spacer()
+//                Spacer()
 
                 Button(action: {
                     // Handle login action
+//                    print("Tapped Login")
                     Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
                         if let error = error {
                             alertMessage = "Login failed: \(error.localizedDescription)"
@@ -70,7 +71,7 @@ struct LoginView: View {
                 }
 
                 // Hidden navigation link trigger
-                NavigationLink(destination: HomePage(), isActive: $navigateToHome) {
+                NavigationLink(destination: MainView(), isActive: $navigateToHome) {
                     EmptyView()
                 }
 //                .navigationBarBackButtonHidden(true)
