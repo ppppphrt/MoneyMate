@@ -19,7 +19,8 @@ class TransactionViewModel: ObservableObject {
                     return
                 }
 
-                self.transactions = documents.compactMap { Transaction(from: $0) }
+                self.transactions = documents.compactMap { Transaction(document: $0) }
+
             }
     }
 }
