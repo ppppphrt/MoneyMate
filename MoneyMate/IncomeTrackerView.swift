@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseFirestore
 
 struct IncomeTrackerView: View {
     @State private var isExpenseSelected = false // Income selected by default
@@ -209,21 +210,48 @@ struct IncomeTrackerView: View {
     }
     
     func addTransaction() {
-        // Logic to add a transaction
-        if let amountValue = Double(amount), !title.isEmpty, selectedCategory != nil {
-            if !isExpenseSelected {
+        guard let amountValue = Double(amount),
+              !title.isEmpty,
+              let category = selectedCategory else {
+            print("Validation failed")
+            return
+        }
+
+        let db = Firestore.firestore()
+
+        // Combine selected date + selected time into one `Date`
+        let dateCombined = Calendar.current.date(
+            bySettingHour: Calendar.current.component(.hour, from: selectedTime),
+            minute: Calendar.current.component(.minute, from: selectedTime),
+            second: 0,
+            of: selectedDate
+        ) ?? Date()
+
+        let data: [String: Any] = [
+            "category": category,
+            "note": description,
+            "amount": amountValue,
+            "date": Timestamp(date: dateCombined),
+            "type": "Income"
+        ]
+
+        db.collection("transactions").addDocument(data: data) { error in
+            if let error = error {
+                print("Error adding income: \(error.localizedDescription)")
+            } else {
+                print("Income added!")
+
                 totalIncome += amountValue
+
+                // Reset form
+                title = ""
+                description = ""
+                amount = ""
+                selectedCategory = nil
             }
-            
-            // Clear fields
-            title = ""
-            description = ""
-            amount = ""
-            selectedCategory = nil
-            
-            // Here you would typically save the transaction to your data store
         }
     }
+
 }
 
 

@@ -6,14 +6,20 @@ struct FinancialReportView: View {
     @State private var showIncomeView = false
     @Environment(\.presentationMode) var presentationMode
     
-    let totalAmount: Double = 500
+    var totalAmount: Double {
+        viewModel.expenses.map(\.amount).reduce(0, +)
+    }
     
-    // Fixed explicit type annotation
-    let expenses: [(category: String, amount: Double, color: Color)] = [
-        ("Shopping", 200, Color(red: 0.78, green: 0.49, blue: 0.90)), // Purple
-        ("Subcription", 185, Color(red: 1.0, green: 0.35, blue: 0.35)), // Red
-        ("Food", 100, Color(red: 1.0, green: 0.65, blue: 0.24)) // Orange
-    ]
+    @StateObject private var viewModel = ExpenseViewModel()
+    
+//    let totalAmount: Double = 500
+//    
+//    // Fixed explicit type annotation
+//    let expenses: [(category: String, amount: Double, color: Color)] = [
+//        ("Shopping", 200, Color(red: 0.78, green: 0.49, blue: 0.90)), // Purple
+//        ("Subcription", 185, Color(red: 1.0, green: 0.35, blue: 0.35)), // Red
+//        ("Food", 100, Color(red: 1.0, green: 0.65, blue: 0.24)) // Orange
+//    ]
     
     var body: some View {
         VStack(spacing: 30) {
@@ -50,8 +56,10 @@ struct FinancialReportView: View {
             } else {
                 // Donut chart - same size as income view
                 ZStack {
-                    DonutChart(data: expenses.map { $0.amount },
-                              colors: expenses.map { $0.color },
+                    DonutChart(data: viewModel.expenses
+.map { $0.amount },
+                              colors: viewModel.expenses
+.map { $0.color },
                               centerText: "500 ฿")
                         .frame(width: 200, height: 200)
                 }
@@ -76,11 +84,11 @@ struct FinancialReportView: View {
                     }
                     
                     if isExpanded {
-                        ForEach(expenses.indices, id: \.self) { index in
+                        ForEach(viewModel.expenses.indices, id: \.self) { index in
                             ExpenseRow(
-                                category: expenses[index].category,
-                                amount: expenses[index].amount,
-                                color: expenses[index].color
+                                category: viewModel.expenses[index].category,
+                                amount: viewModel.expenses[index].amount,
+                                color: viewModel.expenses[index].color
                             )
                         }
                     }

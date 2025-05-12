@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseFirestore
 
 struct ExpenseTrackerView: View {
     @State private var isExpenseSelected = true
@@ -15,7 +16,7 @@ struct ExpenseTrackerView: View {
     // For navigation
     @State private var showIncomeTrackerView = false
     
-    let categories = ["Food", "Transportation", "Entertainment", "Shopping", "Utilities", "Health", "Other"]
+    let categories = ["Shopping", "Food", "Transportation", "Subscription", "Other"]
     
     var body: some View {
         NavigationView {
@@ -196,21 +197,48 @@ struct ExpenseTrackerView: View {
     }
     
     func addTransaction() {
-        // Logic to add a transaction
-        if let amountValue = Double(amount), !title.isEmpty, selectedCategory != nil {
-            if isExpenseSelected {
-                totalExpense += amountValue
+        guard let amountValue = Double(amount),
+              !title.isEmpty,
+              let category = selectedCategory else {
+            print("Validation failed")
+            return
+        }
+
+        let db = Firestore.firestore()
+        let dateCombined = Calendar.current.date(
+            bySettingHour: Calendar.current.component(.hour, from: selectedTime),
+            minute: Calendar.current.component(.minute, from: selectedTime),
+            second: 0,
+            of: selectedDate
+        ) ?? Date()
+
+        let data: [String: Any] = [
+            "category": category,
+            "note": description,
+            "amount": amountValue,
+            "date": Timestamp(date: dateCombined),
+            "type": isExpenseSelected ? "Expense" : "Income"
+        ]
+
+        db.collection("transactions").addDocument(data: data) { error in
+            if let error = error {
+                print("Error adding document: \(error.localizedDescription)")
+            } else {
+                print("Transaction added successfully!")
+
+                if isExpenseSelected {
+                    totalExpense += amountValue
+                }
+
+                // Clear fields
+                title = ""
+                description = ""
+                amount = ""
+                selectedCategory = nil
             }
-            
-            // Clear fields
-            title = ""
-            description = ""
-            amount = ""
-            selectedCategory = nil
-            
-            // Here you would typically save the transaction to your data store
         }
     }
+
 }
 
 // Custom rounded corner modifier

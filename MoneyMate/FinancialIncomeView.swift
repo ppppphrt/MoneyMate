@@ -5,11 +5,12 @@ struct FinancialIncomeView: View {
     @State private var isExpanded = true
     @State private var showExpenseView = false
     
-    let totalAmount: Double = 900  // Updated to 900
+    var totalAmount: Double {
+        viewModel.incomes.map(\.amount).reduce(0, +)
+    }
     
-    let incomes: [(category: String, amount: Double, color: Color)] = [
-        ("Salary", 900, Color(red: 0.4, green: 0.8, blue: 0.6))  // Green color
-    ]
+    @StateObject private var viewModel = IncomeViewModel()
+
     
     var body: some View {
         NavigationView {
@@ -45,7 +46,7 @@ struct FinancialIncomeView: View {
                                 .stroke(Color(red: 0.4, green: 0.8, blue: 0.6), lineWidth: 15)  // Green circle
                                 .frame(width: 200, height: 200)
                             
-                            Text("900 ฿")
+                            Text("\(Int(totalAmount)) ฿")
                                 .font(.system(size: 32, weight: .bold))
                         }
                         .padding(.vertical, 30)
@@ -70,13 +71,14 @@ struct FinancialIncomeView: View {
                         }
                         
                         if isExpanded {
-                            ForEach(incomes.indices, id: \.self) { index in
+                            ForEach(viewModel.incomes.indices, id: \.self) { index in
                                 IncomeRow(
-                                    category: incomes[index].category,
-                                    amount: incomes[index].amount,
-                                    color: incomes[index].color
+                                    category: viewModel.incomes[index].category,
+                                    amount: viewModel.incomes[index].amount,
+                                    color: viewModel.incomes[index].color
                                 )
                             }
+
                         }
                     }
                     
