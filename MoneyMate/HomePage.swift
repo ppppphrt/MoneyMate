@@ -32,7 +32,7 @@ struct HomePage: View {
                             .frame(width: 50, height: 50)
                             .foregroundColor(.white)
 
-                        Text("Welcome \(Auth.auth().currentUser?.displayName ?? Auth.auth().currentUser?.email ?? "User")")
+                        Text("Welcome \(Auth.auth().currentUser?.displayName ?? "User")")
                             .font(.headline)
                             .foregroundColor(.white)
                             .padding(.leading, 5)

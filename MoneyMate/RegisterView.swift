@@ -1,10 +1,3 @@
-//
-//  RegisterView.swift
-//  MoneyMate
-//
-//  Created by ppppphrt on 11/5/2568 BE.
-//
-
 import SwiftUI
 import FirebaseAuth
 
@@ -54,15 +47,34 @@ struct RegisterView: View {
 
             Button(action: {
                 // Handle Next button action
-                    Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
-        if let error = error {
-            alertMessage = "Registration failed: \(error.localizedDescription)"
-            showAlert = true
-        } else {
-            alertMessage = "Registration successful! Welcome, \(authResult?.user.email ?? "")"
-            navigateToHome = true
-        }
-    }
+                Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
+                    if let error = error {
+                        alertMessage = "Registration failed: \(error.localizedDescription)"
+                        showAlert = true
+                    } else if let user = authResult?.user {
+                        let changeRequest = user.createProfileChangeRequest()
+                        changeRequest.displayName = name
+                        changeRequest.commitChanges { commitError in
+                            if let commitError = commitError {
+                                alertMessage = "Name could not be saved: \(commitError.localizedDescription)"
+                            } else {
+                                alertMessage = "Registration successful! Welcome, \(name)"
+                                navigateToHome = true
+                            }
+                            showAlert = true
+                        }
+                    }
+                }
+
+//                    Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
+//        if let error = error {
+//            alertMessage = "Registration failed: \(error.localizedDescription)"
+//            showAlert = true
+//        } else {
+//            alertMessage = "Registration successful! Welcome, \(authResult?.user.email ?? "")"
+//            navigateToHome = true
+//        }
+//    }
             }) {
                 Text("Next")
                     .foregroundColor(.white)
