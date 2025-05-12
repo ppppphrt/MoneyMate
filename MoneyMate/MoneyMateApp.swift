@@ -1,17 +1,15 @@
-//
-//  MoneyMateApp.swift
-//  MoneyMate
-//
-//  Created by ppppphrt on 5/4/2568 BE.
-//
-
 import SwiftUI
+import FirebaseCore
 
 @main
 struct MoneyMateApp: App {
+    init() {
+        FirebaseApp.configure()
+    }
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            WelcomeView()
         }
     }
 }
