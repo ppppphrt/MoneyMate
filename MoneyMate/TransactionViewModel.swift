@@ -1,5 +1,6 @@
 import FirebaseFirestore
 import SwiftUI
+import FirebaseAuth
 
 class TransactionViewModel: ObservableObject {
     @Published var transactions: [Transaction] = []
@@ -11,47 +12,55 @@ class TransactionViewModel: ObservableObject {
     }
 
     func fetchTransactions() {
-        db.collection("transactions")
-            .order(by: "date", descending: true)
-            .addSnapshotListener { snapshot, error in
-                guard let documents = snapshot?.documents else {
-                    print("Error fetching transactions: \(error?.localizedDescription ?? "")")
-                    return
-                }
+        guard let userID = Auth.auth().currentUser?.uid else {
+            print("User not logged in")
+            return
+        }
 
-                self.transactions = documents.compactMap { doc in
-                    let data = doc.data()
-                    
-                    guard let category = data["category"] as? String,
-                          let note = data["note"] as? String,
-                          let baseAmount = data["amount"] as? Double,
-                          let type = data["type"] as? String,
-                          let date = data["date"] as? Timestamp else {
-                        return nil
-                    }
+        db.collection("users")
+          .document(userID)
+          .collection("transactions")
+          .order(by: "date", descending: true)
+          .addSnapshotListener { snapshot, error in
+              guard let documents = snapshot?.documents else {
+                  print("Error fetching transactions: \(error?.localizedDescription ?? "")")
+                  return
+              }
 
-                    let isIncome = type.lowercased() == "income"
-                    let amount = isIncome ? baseAmount : -baseAmount
+              self.transactions = documents.compactMap { doc in
+                  let data = doc.data()
+                  
+                  guard let category = data["category"] as? String,
+                        let note = data["note"] as? String,
+                        let baseAmount = data["amount"] as? Double,
+                        let type = data["type"] as? String,
+                        let date = data["date"] as? Timestamp else {
+                      return nil
+                  }
 
-                    let formatter = DateFormatter()
-                    formatter.dateFormat = "hh:mm a"
-                    let time = formatter.string(from: date.dateValue())
+                  let isIncome = type.lowercased() == "income"
+                  let amount = isIncome ? baseAmount : -baseAmount
 
-                    let (icon, color) = self.iconAndColor(for: category, isIncome: isIncome)
+                  let formatter = DateFormatter()
+                  formatter.dateFormat = "hh:mm a"
+                  let time = formatter.string(from: date.dateValue())
 
-                    return Transaction(
-                        id: doc.documentID,
-                        category: category,
-                        note: note,
-                        amount: amount,
-                        time: time,
-                        color: color,
-                        icon: icon,
-                        isIncome: isIncome
-                    )
-                }
-            }
+                  let (icon, color) = self.iconAndColor(for: category, isIncome: isIncome)
+
+                  return Transaction(
+                      id: doc.documentID,
+                      category: category,
+                      note: note,
+                      amount: amount,
+                      time: time,
+                      color: color,
+                      icon: icon,
+                      isIncome: isIncome
+                  )
+              }
+          }
     }
+
 
 
     private func iconAndColor(for category: String, isIncome: Bool) -> (String, Color) {

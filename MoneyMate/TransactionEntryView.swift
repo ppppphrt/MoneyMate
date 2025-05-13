@@ -1,5 +1,6 @@
 import SwiftUI
 import FirebaseFirestore
+import FirebaseAuth
 
 struct TransactionEntryView: View {
     @State private var selectedTab: Int = 0 // 0 = Expense, 1 = Income
@@ -11,22 +12,22 @@ struct TransactionEntryView: View {
     @State private var selectedTime: Date = Date()
     @State private var showDatePicker = false
     @State private var showTimePicker = false
-
+    
     private let expenseCategories = ["Shopping", "Food", "Transportation", "Subscription", "Other"]
     private let incomeCategories = ["Salary", "Investment", "Gift", "Business", "Other"]
-
+    
     var backgroundColor: Color {
         selectedTab == 0 ? Color(hex: "#F85E5E") : Color(hex: "#5AB88F")
     }
-
+    
     var tabTitle: String {
         selectedTab == 0 ? "Expense" : "Income"
     }
-
+    
     var body: some View {
         ZStack {
             backgroundColor.ignoresSafeArea()
-
+            
             VStack(spacing: 20) {
                 // Toggle Tabs
                 HStack {
@@ -38,24 +39,24 @@ struct TransactionEntryView: View {
                                 TabButtonEntry(title: "Expense", selectedTab: $selectedTab, currentIndex: 0, activeColor: Color(hex: "#F85E5E"))
                                 TabButtonEntry(title: "Income", selectedTab: $selectedTab, currentIndex: 1, activeColor: Color(hex: "#5AB88F"))
                             }
-                            .padding(3)
+                                .padding(3)
                         )
                         .padding(.horizontal)
                 }
-
+                
                 // Display total input
                 VStack(alignment: .leading, spacing: 10) {
                     Text("New \(tabTitle)")
                         .fontWeight(.medium)
                         .foregroundColor(.white.opacity(0.8))
-
+                    
                     Text("\(amount.isEmpty ? "0" : amount) ฿")
                         .font(.system(size: 60, weight: .bold))
                         .foregroundColor(.white)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
-
+                
                 // Input Form
                 VStack(spacing: 25) {
                     // Category Picker
@@ -80,26 +81,26 @@ struct TransactionEntryView: View {
                         .cornerRadius(25)
                         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
                     }
-
+                    
                     TextField("Title", text: $title)
                         .padding()
                         .background(Color.white)
                         .cornerRadius(25)
                         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-
+                    
                     TextField("Description", text: $description)
                         .padding()
                         .background(Color.white)
                         .cornerRadius(25)
                         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-
+                    
                     TextField("Amount", text: $amount)
                         .keyboardType(.decimalPad)
                         .padding()
                         .background(Color.white)
                         .cornerRadius(25)
                         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-
+                    
                     // Date & Time Pickers
                     HStack(spacing: 10) {
                         Button(action: { showDatePicker.toggle() }) {
@@ -110,7 +111,7 @@ struct TransactionEntryView: View {
                                 .foregroundColor(.white)
                                 .cornerRadius(25)
                         }
-
+                        
                         Button(action: { showTimePicker.toggle() }) {
                             Label("Time", systemImage: "clock")
                                 .padding()
@@ -120,7 +121,7 @@ struct TransactionEntryView: View {
                                 .cornerRadius(25)
                         }
                     }
-
+                    
                     // Add Button
                     Button(action: saveTransaction) {
                         Text("Add \(tabTitle)")
@@ -130,7 +131,7 @@ struct TransactionEntryView: View {
                             .background(backgroundColor)
                             .cornerRadius(25)
                     }
-
+                    
                     Spacer(minLength: 5)
                 }
                 .padding()
@@ -146,7 +147,7 @@ struct TransactionEntryView: View {
         }
         .navigationBarBackButtonHidden(true)
     }
-
+    
     // MARK: - Save Transaction Logic
     func saveTransaction() {
         guard let amountValue = Double(amount),
@@ -154,14 +155,19 @@ struct TransactionEntryView: View {
               !title.isEmpty else {
             return
         }
-
+        
         let combinedDate = Calendar.current.date(
             bySettingHour: Calendar.current.component(.hour, from: selectedTime),
             minute: Calendar.current.component(.minute, from: selectedTime),
             second: 0,
             of: selectedDate
         ) ?? Date()
-
+        
+        guard let userID = Auth.auth().currentUser?.uid else {
+            print("User not logged in")
+            return
+        }
+        
         let data: [String: Any] = [
             "category": category,
             "note": title,
@@ -170,93 +176,101 @@ struct TransactionEntryView: View {
             "date": Timestamp(date: combinedDate),
             "type": selectedTab == 0 ? "Expense" : "Income"
         ]
-
-        Firestore.firestore().collection("transactions").addDocument(data: data) { error in
-            if let error = error {
-                print("Error saving: \(error.localizedDescription)")
-            } else {
-                title = ""
-                description = ""
-                amount = ""
-                selectedCategory = nil
-            }
-        }
-    }
-}
-
-// MARK: - Tab Button Entry
-struct TabButtonEntry: View {
-    let title: String
-    @Binding var selectedTab: Int
-    let currentIndex: Int
-    let activeColor: Color
-
-    var body: some View {
-        Button(action: {
-            selectedTab = currentIndex
-        }) {
-            Text(title)
-                .fontWeight(.medium)
-                .frame(maxWidth: .infinity)
-                .frame(height: 44)
-                .background(selectedTab == currentIndex ? Capsule().fill(activeColor) : Capsule().fill(Color.clear))
-                .foregroundColor(selectedTab == currentIndex ? .white : activeColor)
-        }
-    }
-}
-
-struct DatePickerView: View {
-    @Binding var selectedDate: Date
-    @Binding var isPresented: Bool
-
-    var body: some View {
-        VStack {
-            HStack {
-                Spacer()
-                Button("Done") {
-                    isPresented = false
+        
+        // Save to user's sub-collection of transactions
+        Firestore.firestore()
+            .collection("users")
+            .document(userID)
+            .collection("transactions")
+            .addDocument(data: data) { error in
+                if let error = error {
+                    print("Error saving: \(error.localizedDescription)")
+                } else {
+                    // Reset inputs after successful save
+                    title = ""
+                    description = ""
+                    amount = ""
+                    selectedCategory = nil
                 }
-                .padding()
             }
-
-            DatePicker(
-                "Select a date",
-                selection: $selectedDate,
-                displayedComponents: .date
-            )
-            .datePickerStyle(GraphicalDatePickerStyle())
-            .padding()
-
-            Spacer()
+    }
+    
+    
+    // MARK: - Tab Button Entry
+    struct TabButtonEntry: View {
+        let title: String
+        @Binding var selectedTab: Int
+        let currentIndex: Int
+        let activeColor: Color
+        
+        var body: some View {
+            Button(action: {
+                selectedTab = currentIndex
+            }) {
+                Text(title)
+                    .fontWeight(.medium)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 44)
+                    .background(selectedTab == currentIndex ? Capsule().fill(activeColor) : Capsule().fill(Color.clear))
+                    .foregroundColor(selectedTab == currentIndex ? .white : activeColor)
+            }
         }
     }
-}
-
-struct TimePickerView: View {
-    @Binding var selectedTime: Date
-    @Binding var isPresented: Bool
-
-    var body: some View {
-        VStack {
-            HStack {
-                Spacer()
-                Button("Done") {
-                    isPresented = false
+    
+    struct DatePickerView: View {
+        @Binding var selectedDate: Date
+        @Binding var isPresented: Bool
+        
+        var body: some View {
+            VStack {
+                HStack {
+                    Spacer()
+                    Button("Done") {
+                        isPresented = false
+                    }
+                    .padding()
                 }
+                
+                DatePicker(
+                    "Select a date",
+                    selection: $selectedDate,
+                    displayedComponents: .date
+                )
+                .datePickerStyle(GraphicalDatePickerStyle())
                 .padding()
+                
+                Spacer()
             }
-
-            DatePicker(
-                "Select a time",
-                selection: $selectedTime,
-                displayedComponents: .hourAndMinute
-            )
-            .datePickerStyle(WheelDatePickerStyle())
-            .padding()
-
-            Spacer()
         }
     }
+    
+    struct TimePickerView: View {
+        @Binding var selectedTime: Date
+        @Binding var isPresented: Bool
+        
+        var body: some View {
+            VStack {
+                HStack {
+                    Spacer()
+                    Button("Done") {
+                        isPresented = false
+                    }
+                    .padding()
+                }
+                
+                DatePicker(
+                    "Select a time",
+                    selection: $selectedTime,
+                    displayedComponents: .hourAndMinute
+                )
+                .datePickerStyle(WheelDatePickerStyle())
+                .padding()
+                
+                Spacer()
+            }
+        }
+    }
+    
 }
 
 #Preview {
