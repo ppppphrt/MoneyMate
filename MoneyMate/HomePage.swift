@@ -22,6 +22,7 @@ struct HomePage: View {
                 RoundedRectangle(cornerRadius: 50)
                     .fill(lightPurp)
                     .frame(height: 250)
+                    .ignoresSafeArea(.container, edges: .top)
                     
 
                 VStack(alignment: .leading, spacing: 20) {
