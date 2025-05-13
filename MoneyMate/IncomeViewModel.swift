@@ -1,5 +1,6 @@
 import FirebaseFirestore
 import SwiftUI
+import FirebaseAuth
 
 class IncomeViewModel: ObservableObject {
     @Published var incomes: [(category: String, amount: Double, color: Color)] = []
@@ -11,16 +12,23 @@ class IncomeViewModel: ObservableObject {
     }
 
     func fetchIncomes() {
-        db.collection("transactions")
+        guard let userID = Auth.auth().currentUser?.uid else {
+            print("User not logged in.")
+            return
+        }
+
+        db.collection("users")
+            .document(userID)
+            .collection("transactions")
             .whereField("type", isEqualTo: "Income")
             .getDocuments { snapshot, error in
                 guard let documents = snapshot?.documents else {
                     print("No income documents: \(error?.localizedDescription ?? "Unknown error")")
                     return
                 }
-                
+
                 var results: [String: Double] = [:]
-                
+
                 for doc in documents {
                     let data = doc.data()
                     if let category = data["category"] as? String,
@@ -37,6 +45,7 @@ class IncomeViewModel: ObservableObject {
                 }
             }
     }
+
 
     func colorForCategory(_ category: String) -> Color {
         switch category.lowercased() {

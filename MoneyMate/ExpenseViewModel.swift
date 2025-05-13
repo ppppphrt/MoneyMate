@@ -1,5 +1,6 @@
 import FirebaseFirestore
 import SwiftUI
+import FirebaseAuth
 
 class ExpenseViewModel: ObservableObject {
     @Published var expenses: [(category: String, amount: Double, color: Color)] = []
@@ -11,7 +12,16 @@ class ExpenseViewModel: ObservableObject {
     }
 
     func fetchExpenses() {
-        db.collection("transactions")
+        
+        guard let userID = Auth.auth().currentUser?.uid else {
+            print("User not logged in.")
+            return
+        }
+
+       
+        db.collection("users")
+            .document(userID)
+            .collection("transactions")
             .whereField("type", isEqualTo: "Expense")
             .getDocuments { snapshot, error in
                 guard let documents = snapshot?.documents else {
