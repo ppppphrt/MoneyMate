@@ -12,91 +12,88 @@ struct RegisterView: View {
     @State private var showAlert = false
     @State private var alertMessage = ""
     @State private var navigateToHome = false
+    @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Spacer().frame(height: 20)
+        NavigationView {
+            VStack(alignment: .leading, spacing: 16) {
+                Spacer().frame(height: 20)
 
-            Text("Register")
-                .font(.system(size: 32, weight: .bold))
+                Text("Register")
+                    .font(.system(size: 32, weight: .bold))
 
-            Text("Enter your personal details.")
-                .foregroundColor(.gray)
-                .font(.subheadline)
-
-            Group {
-                CustomTextField(text: $name, placeholder: "Name")
-                CustomTextField(text: $email, placeholder: "Email", keyboardType: .emailAddress)
-
-                PasswordField(password: $password, isVisible: $isPasswordVisible, placeholder: "Password")
-                PasswordField(password: $confirmPassword, isVisible: $isConfirmPasswordVisible, placeholder: "Confirm Password")
-            }
-
-            HStack {
-                Text("Remember Me for the next time")
-                    .font(.subheadline)
+                Text("Enter your personal details.")
                     .foregroundColor(.gray)
-                Spacer()
-                Toggle("", isOn: $rememberMe)
-                    .toggleStyle(SwitchToggleStyle(tint: .purple))
-                    .labelsHidden()
-            }
-            .padding(.top)
+                    .font(.subheadline)
 
-            Spacer()
-
-            Button(action: {
-                // Handle Next button action
-                Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
-                    if let error = error {
-                        alertMessage = "Registration failed: \(error.localizedDescription)"
-                        showAlert = true
-                    } else if let user = authResult?.user {
-                        let changeRequest = user.createProfileChangeRequest()
-                        changeRequest.displayName = name
-                        changeRequest.commitChanges { commitError in
-                            if let commitError = commitError {
-                                alertMessage = "Name could not be saved: \(commitError.localizedDescription)"
-                            } else {
-                                alertMessage = "Registration successful! Welcome, \(name)"
-                                navigateToHome = true
-                            }
-                            showAlert = true
-                        }
-                    }
+                Group {
+                    CustomTextField(text: $name, placeholder: "Name")
+                    CustomTextField(text: $email, placeholder: "Email", keyboardType: .emailAddress)
+                    PasswordField(password: $password, isVisible: $isPasswordVisible, placeholder: "Password")
+                    PasswordField(password: $confirmPassword, isVisible: $isConfirmPasswordVisible, placeholder: "Confirm Password")
                 }
 
-//                    Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
-//        if let error = error {
-//            alertMessage = "Registration failed: \(error.localizedDescription)"
-//            showAlert = true
-//        } else {
-//            alertMessage = "Registration successful! Welcome, \(authResult?.user.email ?? "")"
-//            navigateToHome = true
-//        }
-//    }
-            }) {
-                Text("Next")
-                    .foregroundColor(.white)
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.purple)
-                    .cornerRadius(28)
+                HStack {
+                    Text("Remember Me for the next time")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                    Spacer()
+                    Toggle("", isOn: $rememberMe)
+                        .toggleStyle(SwitchToggleStyle(tint: .purple))
+                        .labelsHidden()
+                }
+
+                Spacer()
+
+                Button(action: {
+                    guard password == confirmPassword else {
+                        alertMessage = "Passwords do not match."
+                        showAlert = true
+                        return
+                    }
+
+                    Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
+                        if let error = error {
+                            alertMessage = "Registration failed: \(error.localizedDescription)"
+                            showAlert = true
+                        } else if let user = authResult?.user {
+                            let changeRequest = user.createProfileChangeRequest()
+                            changeRequest.displayName = name
+                            changeRequest.commitChanges { commitError in
+                                if let commitError = commitError {
+                                    alertMessage = "Name save failed: \(commitError.localizedDescription)"
+                                    showAlert = true
+                                } else {
+                                    isLoggedIn = true
+                                    navigateToHome = true
+                                }
+                            }
+                        }
+                    }
+                }) {
+                    Text("Next")
+                        .foregroundColor(.white)
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.purple)
+                        .cornerRadius(28)
+                }
+                .alert(isPresented: $showAlert) {
+                    Alert(title: Text("Register"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+                }
+
+                NavigationLink(destination: MainView(), isActive: $navigateToHome) {
+                    EmptyView()
+                }
             }
-            .alert(isPresented: $showAlert) {
-    Alert(title: Text("Registration"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
-}
-            // Hidden navigation link trigger
-            NavigationLink(destination: HomePage(), isActive: $navigateToHome) {
-                EmptyView()
-            }
+            .padding(.horizontal, 24)
+            .padding(.bottom, 20)
+            .navigationBarBackButtonHidden(true)
         }
-        .padding(.horizontal, 24)
-        .padding(.bottom, 20)
-//        .navigationBarBackButtonHidden(true)
     }
 }
+
 
 struct CustomTextField: View {
     @Binding var text: String
